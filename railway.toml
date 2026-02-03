@@ -5,6 +5,7 @@ builder = "dockerfile"
 healthcheckPath = "/setup/healthz"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
+startCommand = "bash -c 'cp -r /data/openclaw-ui-cache/* /openclaw/node_modules/.pnpm/openclaw@*/node_modules/openclaw/dist/control-ui/ 2>/dev/null || true; exec /openclaw/docker-entrypoint.sh'"
 
 [variables]
 PORT = "8080"
