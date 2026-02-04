@@ -21,8 +21,8 @@ RUN corepack enable
 WORKDIR /openclaw
 
 # Pin to a known ref (tag/branch). If it doesn't exist, fall back to main.
-ARG OPENCLAW_GIT_REF=main
-ARG CACHE_BUST=2026-02-04-2145
+ARG OPENCLAW_GIT_REF=v2026.1.30
+ARG CACHE_BUST=2026-02-04-2147-downgrade
 RUN echo "Cache bust: ${CACHE_BUST}" && git clone --depth 1 --branch "${OPENCLAW_GIT_REF}" https://github.com/openclaw/openclaw.git .
 
 # Patch: relax version requirements for packages that may reference unpublished versions.
@@ -56,9 +56,6 @@ RUN npm install --omit=dev && npm cache clean --force
 
 # Copy built openclaw
 COPY --from=openclaw-build /openclaw /openclaw
-
-# Create control-ui symlink (workaround for path resolution bug in 2026.2.x)
-RUN ln -sf /openclaw/dist/control-ui /openclaw/control-ui
 
 # Provide an openclaw executable
 RUN printf '%s\n' '#!/usr/bin/env bash' 'exec node /openclaw/dist/entry.js "$@"' > /usr/local/bin/openclaw \
