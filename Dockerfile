@@ -21,7 +21,8 @@ RUN corepack enable
 WORKDIR /openclaw
 
 # Pin to a known ref (tag/branch). If it doesn't exist, fall back to main.
-ARG OPENCLAW_GIT_REF=43590d8287df1a4e26d953ccd982f093ccf87d0f
+ARG OPENCLAW_GIT_REF=main
+# Cache bust: 2026-02-04
 RUN git clone --depth 1 --branch "${OPENCLAW_GIT_REF}" https://github.com/openclaw/openclaw.git .
 
 # Patch: relax version requirements for packages that may reference unpublished versions.
