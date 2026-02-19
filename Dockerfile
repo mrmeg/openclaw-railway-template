@@ -42,11 +42,33 @@ RUN pnpm ui:install && pnpm ui:build
 # Runtime image
 FROM node:22-bookworm
 ENV NODE_ENV=production
+ENV XDG_CONFIG_HOME=/data/.config
+ENV XDG_CACHE_HOME=/data/.cache
+ENV XDG_DATA_HOME=/data/.local/share
 
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
+    curl \
+    jq \
+    ripgrep \
+    gh \
+    ffmpeg \
   && rm -rf /var/lib/apt/lists/*
+
+# Install gog CLI from official release (no apt package available).
+ARG GOG_VERSION=v0.11.0
+RUN set -eux; \
+  arch="$(dpkg --print-architecture)"; \
+  case "$arch" in \
+    amd64) gog_arch="amd64" ;; \
+    arm64) gog_arch="arm64" ;; \
+    *) echo "Unsupported architecture for gog: $arch"; exit 1 ;; \
+  esac; \
+  curl -fsSL -o /tmp/gogcli.tgz "https://github.com/steipete/gogcli/releases/download/${GOG_VERSION}/gogcli_${GOG_VERSION#v}_linux_${gog_arch}.tar.gz"; \
+  tar -xzf /tmp/gogcli.tgz -C /tmp; \
+  install -m 0755 /tmp/gog /usr/local/bin/gog; \
+  rm -f /tmp/gogcli.tgz /tmp/gog
 
 # `openclaw update` expects pnpm. Provide it in the runtime image.
 RUN corepack enable && corepack prepare pnpm@10.23.0 --activate
